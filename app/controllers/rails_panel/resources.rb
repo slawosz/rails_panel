@@ -6,7 +6,12 @@ module RailsPanel
       before_filter :set_current_model
       helper_method :current_model
       helper_method :current_resource
-      helper 'rails_panel/resources'
+      # hack to bring up resources helper before other applications helper
+      # to make them posibility to overide its methods, but it may be better way
+      # to do this
+      _temp_helpers = self._helpers
+      self._helpers = Module.new { include ResourcesHelper }
+      self. _helpers.module_eval { include _temp_helpers }
       layout 'rails_panel/twitter_bootstrap'
     end
 
