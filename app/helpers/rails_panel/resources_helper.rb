@@ -2,6 +2,7 @@ module RailsPanel
   module ResourcesHelper
 
     def render_resources_menu
+      return if @resources_menu.nil?
       html = '<ul class="pills">'
       @resources_menu.each do |title, path|
         html << "<li>" + link_to(title, path) + "</li>"
