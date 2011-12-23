@@ -36,6 +36,10 @@ module RailsPanel
       current_model.show_attributes_keys
     end
 
+    def show_attributes
+      current_model.show_attributes
+    end
+
     def attributes
       current_model.attributes
     end
