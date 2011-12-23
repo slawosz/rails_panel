@@ -7,6 +7,7 @@ module RailsPanel
       helper_method :current_model
       helper_method :current_resource
       helper 'rails_panel/resources'
+      layout 'rails_panel/twitter_bootstrap'
     end
 
     module ClassMethods
@@ -15,6 +16,7 @@ module RailsPanel
       def parent_prefixes
         super << ["rails_panel/resources"]
       end
+
     end
 
     module InstanceMethods
