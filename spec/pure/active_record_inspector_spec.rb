@@ -39,7 +39,8 @@ class Order < FakeModel
   build_associations(
     :products  => {:macro => :has_and_belongs_to_many, :name => :products, :class_name => "Product", :association_foreign_key => 'product_id', :collection => true},
     :customer  => {:macro => :belongs_to, :name => :customer, :collection => false},
-    :discounts => {:macro => :has_many, :name => :discounts, :collection => true}
+    :discounts => {:macro => :has_many, :name => :discounts, :collection => true},
+    :invoice => {:macro => :has_one, :name => :invoice, :collection => false}
   )
 end
 
@@ -63,6 +64,12 @@ class Product < FakeModel
 end
 
 class Customer < FakeModel
+  def self.all
+    [OpenStruct.new(:_name => :foo, :id => 1),OpenStruct.new(:_name => :bar, :id => 2)]
+  end
+end
+
+class Invoice < FakeModel
   def self.all
     [OpenStruct.new(:_name => :foo, :id => 1),OpenStruct.new(:_name => :bar, :id => 2)]
   end
@@ -92,7 +99,7 @@ describe RailsPanel::ActiveRecordInspector do
   context "model associations" do
 
     it "should return all associations" do
-      Order.associations.keys.should == [:products, :customer, :discounts]
+      Order.associations.keys.should == [:products, :customer, :discounts, :invoice]
     end
 
     it "should return proper associations attributes" do
@@ -137,6 +144,19 @@ describe RailsPanel::ActiveRecordInspector do
       )
       discounts_asoc[:display].call(fake_object_to_call_display).should == [:foo, :bar]
       discounts_asoc[:form_data].call.should == :method_all_in_discount_called
+
+      invoice_asoc = Order.associations[:invoice]
+      invoice_asoc[:type].should == :association
+      invoice_asoc[:form_partial].should == 'has_one'
+      invoice_asoc[:association_type].should == :has_one
+      invoice_asoc[:associated_model].should == Invoice
+      invoice_asoc[:form_field].should == :invoice_id
+
+      fake_object_to_call_display = OpenStruct.new(
+        :invoice => OpenStruct.new(:_name => :foo)
+      )
+      invoice_asoc[:display].call(fake_object_to_call_display).should == :foo
+      customer_asoc[:form_data].call.should == [[:foo, 1],[:bar, 2]]
     end
   end
 

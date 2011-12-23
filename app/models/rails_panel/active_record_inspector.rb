@@ -17,7 +17,7 @@ module RailsPanel
         self.columns_hash.each do |field,data|
           fields[field.to_sym] = {:form_partial => type_to_partial[data.type], :display => :simple}
         end
-        associations.each do |field,data|
+        associations.each_value do |data|
           fields.delete(data[:form_field])
         end
         excluded_fields.each do |field|
@@ -46,7 +46,7 @@ module RailsPanel
             :associated_model => name.to_s.singularize.classify.constantize,
             :association_type => data.macro,
             :form_field => (name.to_s.singularize + "_id").to_sym,
-            :display => data.collection? ? lambda {|obj| obj.send(name).map{|a| a.send(:_name)}} : lambda {|obj| obj.send(name).send(:_name)},
+            :display => data.collection? ? lambda {|obj| obj.send(name).map{|a| a.send(:_name)}} : lambda {|obj| (rel_obj = obj.send(name)) ? rel_obj.send(:_name) : nil},
             :form_data => form_data_proc_for_association(name.to_s.singularize.classify.constantize)[data.macro]
           }
         end
@@ -64,6 +64,7 @@ module RailsPanel
           :datetime => 'text_field',
           :belongs_to => 'belongs_to',
           :has_many   => 'has_many',
+          :has_one   => 'has_one',
           :has_and_belongs_to_many => 'has_many',
         }
       end
@@ -72,6 +73,7 @@ module RailsPanel
       def form_data_proc_for_association(model_class)
         {
           :belongs_to => lambda { model_class.all.map{ |c| [c._name, c.id] }},
+          :has_one => lambda { model_class.all.map{ |c| [c._name, c.id] }},
           :has_many   => lambda { model_class.all },
           :has_and_belongs_to_many => lambda { model_class.all }
         }
