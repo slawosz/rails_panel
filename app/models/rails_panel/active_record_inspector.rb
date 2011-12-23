@@ -1,0 +1,144 @@
+require 'active_support/concern'
+require 'active_support/core_ext/string'
+require 'active_support/inflector'
+
+module RailsPanel
+  module ActiveRecordInspector
+    extend ActiveSupport::Concern
+
+    module ClassMethods
+
+      # returns model fields hash, where field is key and its value is hash with keys:
+      # * :display - how to display the hash, default has value :simple
+      # * :form_partial - which partial will be used to display this field in form,
+      # generaly it is determined by type_to_partial using field type.
+      def fields
+        fields = {}
+        self.columns_hash.each do |field,data|
+          fields[field.to_sym] = {:form_partial => type_to_partial[data.type], :display => :simple}
+        end
+        associations.each do |field,data|
+          fields.delete(data[:form_field])
+        end
+        excluded_fields.each do |field|
+          fields.delete field
+        end
+        fields
+      end
+
+      # returns model associations hash, where association name is key which value is hash
+      # with keys:
+      # * :type - informs that is association, has value :association
+      # * :form_partial - which partial will be used to display this field in form,
+      # generaly it is determined by type_to_partial using association_type.
+      # * :associatied_model - class of model that is associated
+      # * :association_type - type of association (has_many, belongs_to and so on)
+      # * :form_field - field used for html input
+      # * :display - proc which get one parameter (model instance) and returns String (based on model _name method) or Array of string,
+      # used for displaying associated record(s) in show page
+      # * :form_data - proc which return data to display in form input, used for selecting associated records
+      def associations
+        assocs = {}
+        self.reflections.each do |name, data|
+          assocs[name] = {
+            :type => :association,
+            :form_partial => type_to_partial[data.macro],
+            :associated_model => name.to_s.singularize.classify.constantize,
+            :association_type => data.macro,
+            :form_field => (name.to_s.singularize + "_id").to_sym,
+            :display => data.collection? ? lambda {|obj| obj.send(name).map{|a| a.send(:_name)}} : lambda {|obj| obj.send(name).send(:_name)},
+            :form_data => form_data_proc_for_association(name.to_s.singularize.classify.constantize)[data.macro]
+          }
+        end
+        assocs
+      end
+
+      # returns hash which key is field or association type and value is a partial
+      # that will be displayed in form
+      def type_to_partial
+        {
+          :text => 'text_area',
+          :string => 'text_field',
+          :integer => 'text_field',
+          :float => 'text_field',
+          :datetime => 'text_field',
+          :belongs_to => 'belongs_to',
+          :has_many   => 'has_many',
+          :has_and_belongs_to_many => 'has_many',
+        }
+      end
+      private :type_to_partial
+
+      def form_data_proc_for_association(model_class)
+        {
+          :belongs_to => lambda { model_class.all.map{ |c| [c._name, c.id] }},
+          :has_many   => lambda { model_class.all },
+          :has_and_belongs_to_many => lambda { model_class.all }
+        }
+      end
+      private :form_data_proc_for_association
+
+      def properties
+        {
+          :params_key => self.name.downcase.to_sym
+        }
+      end
+
+      def associations_keys
+        associations.keys
+      end
+
+      def fields_keys
+        fields.keys
+      end
+
+      def attributes
+        fields.merge associations
+      end
+
+      def attributes_keys
+        associations_keys + fields_keys
+      end
+
+      def table_attributes_keys
+        attributes_keys
+      end
+
+      def form_attributes_keys
+        attributes_keys
+      end
+
+      def show_attributes_keys
+        attributes_keys
+      end
+
+      def table_attributes
+        attributes
+      end
+
+      def form_attributes
+        attributes
+      end
+
+      def show_attributes
+        attributes
+      end
+
+      def excluded_fields
+        [:id, :created_at, :updated_at]
+      end
+    end
+
+    module InstanceMethods
+      def _name
+        if self.respond_to? :name
+          return self.name
+        end
+        if self.respond_to? :title
+          return self.title
+        end
+        self.class.name + self.id.to_s
+      end
+    end
+  end
+end

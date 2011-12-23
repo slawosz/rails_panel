@@ -1,0 +1,12 @@
+<tr>
+  <% table_attributes_keys.each do |attribute| %>
+    <% if attributes[attribute][:type] == :association %>
+      <th><%= attributes[attribute][:display].call(resource) %></th>
+    <% else %>
+      <th><%= resource.send(attribute) %></th>
+    <% end %>
+  <% end %>
+  <th><%= link_to 'Show resource', resource %></th>
+  <th><%= link_to 'Edit resource', url_for([:edit, resource]) %></th>
+  <th></th>
+</tr>

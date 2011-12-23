@@ -1,0 +1,8 @@
+<%= link_to "New", url_for([:new, current_model.to_s.downcase.to_sym]) %>
+<table class='condensed-table'>
+  <%= render 'resource_header' %>
+  <% @resources.each do |resource| %>
+    <%= render :partial => 'resource_row', :locals => {:resource => resource} %>
+  <% end %>
+<table>
+<%= link_to_new %>

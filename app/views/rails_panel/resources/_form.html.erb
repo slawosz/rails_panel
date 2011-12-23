@@ -1,0 +1,14 @@
+<%= form_for @resource do |f| %>
+  <% form_attributes_keys.each do |attribute_key| %>
+    <% p attribute_key %>
+    <% attribute_data = attributes[attribute_key] %>
+    <% if attribute_data[:type] == :association %>
+      <%= render :partial => attribute_data[:form_partial], :locals => {:form_instance => f, :form_data => attribute_data[:form_data], :form_field => attribute_data[:form_field], :association => attribute_key } %>
+    <% else %>
+      <%= render :partial => attribute_data[:form_partial], :locals => {:form_instance => f, :form_values => attribute_key, :form_field => attribute_key} %>
+    <% end %>
+  <% end %>
+  <div class="actions">
+    <input type="submit" class="btn primary" value="Save changes">&nbsp;<button type="reset" class="btn">Cancel</button>
+  </div>
+<% end %>

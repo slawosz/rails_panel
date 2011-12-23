@@ -1,0 +1,23 @@
+<% show_attributes_keys.each do |key| %>
+  <% if attributes[key][:display] == :simple %>
+    <li><b><%= key %></b>:<%= @resource.send(key) %></li>
+  <% elsif (display_proc = attributes[key][:display]).is_a? Proc %>
+    <% if (rendered_attributes = display_proc.call(@resource)).is_a? Array %>
+      <% if rendered_attributes.to_a.length > 0 %>
+        <li>
+        <b><%= key %></b>
+          <ul>
+            <%# TODO: does rendered_attributes should be array of object labels or objects%>
+            <% rendered_attributes.map do |attr| %>
+              <li><%= attr %></li>
+            <% end %>
+          </ul>
+        </li>
+      <% end %>
+    <% else %>
+      <li><b><%= key %></b>:<%= rendered_attributes %></li>
+    <% end %>
+  <% end %>
+<% end %>
+<%= link_to_index %>
+<%= link_to_edit %>
