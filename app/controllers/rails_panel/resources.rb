@@ -4,14 +4,14 @@ module RailsPanel
 
     included do
       before_filter :set_current_model
-      helper_method :current_model
-      helper_method :current_resource
+      helper_method :current_model, :current_resource
       # hack to bring up resources helper before other applications helper
       # to make them posibility to overide its methods, but it may be better way
       # to do this
       _temp_helpers = self._helpers
       self._helpers = Module.new { include ResourcesHelper }
       self. _helpers.module_eval { include _temp_helpers }
+      # load standard layout
       layout 'rails_panel/twitter_bootstrap'
     end
 
@@ -21,7 +21,6 @@ module RailsPanel
       def parent_prefixes
         super << ["rails_panel/resources"]
       end
-
     end
 
     module InstanceMethods
@@ -38,8 +37,12 @@ module RailsPanel
       end
 
       def create
-        @resource = create_resource
-        redirect_to @resource
+        @resource = resource_for_create
+        if @resource.save
+          redirect_to @resource
+        else
+          render :action => :new
+        end
       end
 
       def edit
@@ -63,7 +66,7 @@ module RailsPanel
         current_model.all
       end
 
-      def create_resource
+      def resource_for_create
         current_model.create(params[current_model.properties[:params_key]])
       end
 
@@ -107,7 +110,7 @@ module RailsPanel
       end
 
       def model_mappings
-        self.class.controller_name.singularize.capitalize.constantize
+        self.class.controller_name.classify.singularize.constantize
       end
     end
 

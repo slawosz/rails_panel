@@ -6,6 +6,14 @@ class FakeAssociation < OpenStruct
   def collection?
     collection
   end
+
+  def options
+    if super
+      super
+    else
+      {}
+    end
+  end
 end
 
 class FakeColumns < OpenStruct
@@ -44,6 +52,26 @@ class Order < FakeModel
   )
 end
 
+class Car < FakeModel
+  build_fields
+  build_associations(
+    :clients => {:macro => :has_many, :options => {:through => :rentals}, :collection => true, :name => :clients},
+    :rentals => {:macro => :has_many, :collection => true, :name => :clients}
+  )
+end
+
+class Client < FakeModel
+  def self.all
+    :method_all_in_client_called
+  end
+end
+
+class Rental < FakeModel
+  def self.all
+    :method_all_in_rental_called
+  end
+end
+
 class Article < FakeModel
   build_associations
   build_fields({"name" => {:type => :string}, "content" => {:type => :text}, "published_at" => {:type => :datetime}})
@@ -64,6 +92,8 @@ class Product < FakeModel
 end
 
 class Customer < FakeModel
+  build_associations
+  build_fields("birth_date" => {:type => :date})
   def self.all
     [OpenStruct.new(:_name => :foo, :id => 1),OpenStruct.new(:_name => :bar, :id => 2)]
   end
@@ -93,6 +123,7 @@ describe RailsPanel::ActiveRecordInspector do
       Article.fields[:published_at].should == {:display => :simple, :form_partial => 'text_field'}
       Product.fields[:in_store].should == {:display => :simple, :form_partial => 'text_field'}
       Product.fields[:price].should == {:display => :simple, :form_partial => 'text_field'}
+      Customer.fields[:birth_date].should == {:display => :simple, :form_partial => 'text_field'}
     end
   end
 
@@ -157,6 +188,45 @@ describe RailsPanel::ActiveRecordInspector do
       )
       invoice_asoc[:display].call(fake_object_to_call_display).should == :foo
       customer_asoc[:form_data].call.should == [[:foo, 1],[:bar, 2]]
+    end
+
+    context "has many throught" do
+      it "should return proper associations attributes" do
+        clients_asoc = Car.associations[:clients]
+        clients_asoc[:type].should == :association
+        clients_asoc[:form_partial].should == 'has_many'
+        clients_asoc[:association_type].should == :has_many
+        clients_asoc[:associated_model].should == Client
+        clients_asoc[:form_field].should == :client_id
+        clients_asoc[:through].should == :rentals
+
+        fake_object_to_call_display = OpenStruct.new(
+          :clients => [OpenStruct.new(:_name => :foo),OpenStruct.new(:_name => :bar)]
+        )
+        clients_asoc[:display].call(fake_object_to_call_display).should == [:foo, :bar]
+        clients_asoc[:form_data].call.should == :method_all_in_client_called
+
+        rentals_asoc = Car.associations[:rentals]
+        rentals_asoc[:type].should == :association
+        rentals_asoc[:form_partial].should == 'has_many'
+        rentals_asoc[:association_type].should == :has_many
+        rentals_asoc[:associated_model].should == Rental
+        rentals_asoc[:form_field].should == :rental_id
+
+        fake_object_to_call_display = OpenStruct.new(
+          :rentals => [OpenStruct.new(:_name => :foo),OpenStruct.new(:_name => :bar)]
+        )
+        rentals_asoc[:display].call(fake_object_to_call_display).should == [:foo, :bar]
+        rentals_asoc[:form_data].call.should == :method_all_in_rental_called
+      end
+      it "should not should not show its attributes in keys for form by default" do
+        Car.form_attributes_keys.should == []
+      end
+
+      it "should not show record related in has many through association in show and index" do
+        Car.show_attributes_keys.should == [:rentals]
+        Car.table_attributes_keys.should == [:rentals]
+      end
     end
   end
 

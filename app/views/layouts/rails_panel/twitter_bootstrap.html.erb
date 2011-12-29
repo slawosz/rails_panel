@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Bootstrap, from Twitter</title>
+    <title><%= yield :title %></title>
     <meta name="description" content="">
     <meta name="author" content="">
     <%= stylesheet_link_tag    "application" %>
@@ -99,12 +99,11 @@
 
       <div class="content">
         <div class="page-header">
-          <h1>Page name <small>Supporting text or tagline</small></h1>
+          <h1><%= yield :title %> <small><%= yield :subtitle %></small></h1>
           <%= render_resources_menu %>
         </div>
         <div class="row">
           <div class="span10">
-            <h2>Main content</h2>
             <%= yield %>
           </div>
           <%# <div class="span4">%>

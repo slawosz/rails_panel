@@ -37,20 +37,28 @@ module RailsPanel
       # * :display - proc which get one parameter (model instance) and returns String (based on model _name method) or Array of string,
       # used for displaying associated record(s) in show page
       # * :form_data - proc which return data to display in form input, used for selecting associated records
+      # * :through - if model is associated with another with has many through association, this key stores association used for through association
       def associations
-        assocs = {}
+        @assocs ||= {}
+        @form_excluded_keys = []
+        @show_and_table_excluded_keys = []
         self.reflections.each do |name, data|
-          assocs[name] = {
+          @assocs[name] = {
             :type => :association,
             :form_partial => type_to_partial[data.macro],
-            :associated_model => name.to_s.singularize.classify.constantize,
+            :associated_model => name.to_s.classify.singularize.constantize,
             :association_type => data.macro,
             :form_field => (name.to_s.singularize + "_id").to_sym,
             :display => data.collection? ? lambda {|obj| obj.send(name).map{|a| a.send(:_name)}} : lambda {|obj| (rel_obj = obj.send(name)) ? rel_obj.send(:_name) : nil},
-            :form_data => form_data_proc_for_association(name.to_s.singularize.classify.constantize)[data.macro]
+            :form_data => form_data_proc_for_association(name.to_s.classify.singularize.constantize)[data.macro],
+            :through => data.options[:through]
           }
+          if (to_exclude = data.options[:through])
+            @form_excluded_keys << to_exclude << name
+            @show_and_table_excluded_keys << name
+          end
         end
-        assocs
+        @assocs
       end
 
       # returns hash which key is field or association type and value is a partial
@@ -62,6 +70,7 @@ module RailsPanel
           :integer => 'text_field',
           :float => 'text_field',
           :datetime => 'text_field',
+          :date=> 'text_field',
           :belongs_to => 'belongs_to',
           :has_many   => 'has_many',
           :has_one   => 'has_one',
@@ -102,29 +111,38 @@ module RailsPanel
         associations_keys + fields_keys
       end
 
-      def table_attributes_keys
-        attributes_keys
+      def show_and_table_attributes
+        attributes
       end
 
-      def form_attributes_keys
-        attributes_keys
+      def show_and_table_attributes_keys
+        show_and_table_attributes.keys - @show_and_table_excluded_keys
+      end
+
+      def show_attributes
+        show_and_table_attributes
       end
 
       def show_attributes_keys
-        attributes_keys
+        show_attributes.keys - @show_and_table_excluded_keys
       end
 
       def table_attributes
-        attributes
+        show_and_table_attributes
+      end
+
+      def table_attributes_keys
+        table_attributes.keys - @show_and_table_excluded_keys
       end
 
       def form_attributes
         attributes
       end
 
-      def show_attributes
-        attributes
+      def form_attributes_keys
+        form_attributes.keys - @form_excluded_keys
       end
+
 
       def excluded_fields
         [:id, :created_at, :updated_at]

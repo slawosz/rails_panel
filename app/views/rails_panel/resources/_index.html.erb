@@ -1,4 +1,4 @@
-<%= link_to "New", url_for([:new, current_model.to_s.downcase.to_sym]) %>
+<%= link_to_new %>
 <table class='condensed-table'>
   <%= render 'resource_header' %>
   <% @resources.each do |resource| %>

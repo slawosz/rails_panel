@@ -20,6 +20,14 @@ module RailsPanel
       html.html_safe
     end
 
+    def title(_title = controller.controller_name)
+      content_for(:title) { _title.titleize }
+    end
+
+    def subtitle(_subtitle = controller.action_name)
+      content_for(:subtitle) { _subtitle }
+    end
+
     def table_attributes_keys
       current_model.table_attributes_keys
     end
@@ -57,7 +65,7 @@ module RailsPanel
     end
 
     def link_to_new
-      link_to "New", url_for([:new, current_model.name.downcase.to_sym])
+      link_to "New", url_for([:new, current_model.name.underscore.to_sym])
     end
   end
 end
