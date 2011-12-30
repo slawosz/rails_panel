@@ -1,3 +1,4 @@
+require 'formtastic'
 module RailsPanel
   module Resources
     extend ActiveSupport::Concern
@@ -9,8 +10,13 @@ module RailsPanel
       # to make them posibility to overide its methods, but it may be better way
       # to do this
       _temp_helpers = self._helpers
-      self._helpers = Module.new { include ResourcesHelper }
-      self. _helpers.module_eval { include _temp_helpers }
+      self._helpers = Module.new
+      _temp_helpers.ancestors.each do |mod|
+        if mod.to_s == 'ApplicationHelper'
+          _helpers.module_eval { include ResourcesHelper }
+        end
+        self. _helpers.module_eval { include mod }
+      end
       # load standard layout
       layout 'rails_panel/twitter_bootstrap'
     end

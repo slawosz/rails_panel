@@ -17,6 +17,8 @@ Gem::Specification.new do |s|
   s.test_files = Dir["test/**/*"]
 
   s.add_dependency "rails", "~> 3.1.1"
+  s.add_dependency "formtastic"
+  s.add_dependency "formtastic-bootstrap"
   # s.add_dependency "jquery-rails"
 
   s.add_development_dependency "sqlite3"

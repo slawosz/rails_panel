@@ -1,3 +1,1 @@
-<%= form_field_for form_instance, form_field do %>
-  <%= form_instance.select form_field, options_for_select([[nil,nil]] + form_data.call) %>
-<% end %>
+<%= form_instance.input form_field, :as => :select, :collection => form_data.call %>

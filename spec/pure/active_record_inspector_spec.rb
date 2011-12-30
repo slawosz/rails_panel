@@ -120,10 +120,10 @@ describe RailsPanel::ActiveRecordInspector do
     it "should return proper fields attributes" do
       Article.fields[:name].should == {:display => :simple, :form_partial => 'text_field'}
       Article.fields[:content].should == {:display => :simple, :form_partial => 'text_area'}
-      Article.fields[:published_at].should == {:display => :simple, :form_partial => 'text_field'}
+      Article.fields[:published_at].should == {:display => :simple, :form_partial => 'date_time'}
       Product.fields[:in_store].should == {:display => :simple, :form_partial => 'text_field'}
       Product.fields[:price].should == {:display => :simple, :form_partial => 'text_field'}
-      Customer.fields[:birth_date].should == {:display => :simple, :form_partial => 'text_field'}
+      Customer.fields[:birth_date].should == {:display => :simple, :form_partial => 'date'}
     end
   end
 
