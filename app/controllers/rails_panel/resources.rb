@@ -11,10 +11,11 @@ module RailsPanel
       # to do this
       _temp_helpers = self._helpers
       self._helpers = Module.new
-      _temp_helpers.ancestors.each do |mod|
+      _temp_helpers.ancestors.reverse.each do |mod|
         if mod.to_s == 'ApplicationHelper'
           _helpers.module_eval { include ResourcesHelper }
         end
+        p mod
         self. _helpers.module_eval { include mod }
       end
       # load standard layout
