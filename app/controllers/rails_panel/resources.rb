@@ -15,9 +15,10 @@ module RailsPanel
         if mod.to_s == 'ApplicationHelper'
           _helpers.module_eval { include ResourcesHelper }
         end
-        p mod
         self. _helpers.module_eval { include mod }
+        p mod
       end
+      p self._helpers.included_modules
       # load standard layout
       layout 'rails_panel/twitter_bootstrap'
     end
@@ -117,7 +118,10 @@ module RailsPanel
       end
 
       def model_mappings
+        return if RailsPanel.controllers_without_model_mappings.map(&:name).include? self.class.name
         self.class.controller_name.classify.singularize.constantize
+      rescue
+        raise "Can not find model for #{self.class.name}. Overide model_mappings method in this controller or exclude it from using rails_panel in initializers."
       end
     end
 
