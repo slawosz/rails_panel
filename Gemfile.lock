@@ -115,6 +115,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  formtastic
+  formtastic-bootstrap
   jquery-rails
   rails_panel!
   rspec-rails
