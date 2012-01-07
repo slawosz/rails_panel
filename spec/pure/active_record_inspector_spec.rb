@@ -110,6 +110,7 @@ class Discount < FakeModel
     :method_all_in_discount_called
   end
 end
+
 describe RailsPanel::ActiveRecordInspector do
   context "model fields" do
 
@@ -236,6 +237,13 @@ describe RailsPanel::ActiveRecordInspector do
 
   it "should exclude id and timestamp from fields" do
     Post.fields.keys.should == [:name]
+  end
+
+  it "should has valid params_key property" do
+    class FooBar < FakeModel
+    end
+
+    FooBar.properties[:params_key].should == :foo_bar
   end
 end
 

@@ -89,9 +89,11 @@ module RailsPanel
       end
       private :form_data_proc_for_association
 
+      # model properties
+      # * :params_key - key that will be used to get model data form params hash
       def properties
         {
-          :params_key => self.name.downcase.to_sym
+          :params_key => self.name.underscore.to_sym
         }
       end
 
