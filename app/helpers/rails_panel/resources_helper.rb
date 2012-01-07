@@ -56,16 +56,5 @@ module RailsPanel
       current_model.properties[:params_key]
     end
 
-    def link_to_index
-      link_to 'Back to index', url_for(current_model.name.pluralize.downcase.to_sym)
-    end
-
-    def link_to_edit
-      link_to 'Edit', url_for([:edit, current_resource])
-    end
-
-    def link_to_new
-      link_to "New", url_for([:new, current_model.name.underscore.to_sym])
-    end
   end
 end

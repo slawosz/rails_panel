@@ -6,7 +6,7 @@
       <td><%= resource.send(attribute) %></td>
     <% end %>
   <% end %>
-  <td><%= link_to 'Show', resource %></td>
-  <td><%= link_to 'Edit', url_for([:edit, resource]) %></td>
+  <td><%= link_to link_to_show(resource, 'Show') %></td>
+  <td><%= link_to link_to_edit(resource) %></td>
   <td></td>
 </tr>

@@ -1,4 +1,4 @@
-<%= semantic_form_for @resource do |f| %>
+<%= semantic_form_for current_resource, :url => (current_resource.new_record? ? url_for_create : url_for_update(current_resource)) do |f| %>
   <%= f.inputs do %>
     <% form_attributes_keys.each do |attribute_key| %>
       <% attribute_data = form_attributes[attribute_key] %>
