@@ -8,7 +8,7 @@ module RailsPanel
       helper_method :current_model, :current_resource
 
       # url helpers
-      helper_method :link_to_new, :link_to_edit, :link_to_index, :link_to_show, :url_for_create, :url_for_update
+      helper_method :link_to_new, :link_to_edit, :link_to_index, :link_to_show, :link_to_destroy, :url_for_create, :url_for_update
       # hack to bring up resources helper before other applications helper
       # to make them posibility to overide its methods, but it may be better way
       # to do this
@@ -50,8 +50,9 @@ module RailsPanel
       def create
         @resource = resource_for_create
         if @resource.save
-          redirect_to url_for_show(@resource)
+          redirect_to url_for_show(@resource), :notice => notice_for(@resource, :create)
         else
+          flash[:alert] = notice_for(@resource, :create, :failure)
           render :action => :new
         end
       end
@@ -63,15 +64,22 @@ module RailsPanel
       def update
         @resource = resource_for_update
         if update_resource(@resource)
-          redirect_to url_for_show(@resource)
+          redirect_to url_for_show(@resource), :notice => notice_for(@resource, :update)
         else
-          render :action => :new
+          flash[:alert] = notice_for(@resource, :update, :failure)
+          render :action => :edit
         end
       end
 
       def destroy
         destroy_resource
-        redirect_to :index
+        if current_resource.destroyed?
+          flash[:notice] = notice_for(current_resource, :destroyed)
+        else
+          flash[:alert] = notice_for(current_resource, :destroyed, :failure)
+        end
+
+        redirect_to url_for_index
       end
 
       private
@@ -90,6 +98,7 @@ module RailsPanel
       end
 
       def destroy_resource
+        resource_for_destroy.destroy
       end
 
       def resource_for_new
@@ -108,8 +117,8 @@ module RailsPanel
         current_model.find(params[:id])
       end
 
-      def resource_for_delete
-        current_model.find(params[:id])
+      def resource_for_destroy
+        @resource = current_model.find(params[:id])
       end
 
       def set_current_model
@@ -163,6 +172,14 @@ module RailsPanel
         url_for(:controller => _controller_url, :action => "edit", :id => resource.id)
       end
 
+      def link_to_destroy(resource)
+        view_context.link_to 'Destroy', url_for_destroy(resource), :confirm => 'Are you sure?', :method => :delete
+      end
+
+      def url_for_destroy(resource)
+        url_for(:controller => _controller_url, :action => "destroy", :id => resource.id)
+      end
+
       def url_for_create
         view_context.url_for(:controller => _controller_url, :action => "create")
       end
@@ -175,6 +192,10 @@ module RailsPanel
       # I had problem with it in helper so I moved it here
       def _controller_url
         self.class.name.underscore.sub('_controller','')
+      end
+
+      def notice_for(resource, action, result = :success)
+        "#{resource._name}, action #{action}"
       end
     end
 
