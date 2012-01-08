@@ -42,6 +42,7 @@ module RailsPanel
         @assocs ||= {}
         @form_excluded_keys = []
         @show_and_table_excluded_keys = []
+        @table_excluded_keys = []
         self.reflections.each do |name, data|
           @assocs[name] = {
             :type => :association,
@@ -56,6 +57,9 @@ module RailsPanel
           if (to_exclude = data.options[:through])
             @form_excluded_keys << to_exclude << name
             @show_and_table_excluded_keys << name
+          end
+          if data.macro == :has_many || data.macro == :has_and_belongs_to_many
+            @table_excluded_keys << name
           end
         end
         @assocs
@@ -134,7 +138,7 @@ module RailsPanel
       end
 
       def table_attributes_keys
-        table_attributes.keys - @show_and_table_excluded_keys
+        (table_attributes.keys - @show_and_table_excluded_keys) - @table_excluded_keys
       end
 
       def form_attributes

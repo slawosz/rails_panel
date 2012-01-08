@@ -56,7 +56,7 @@ class Car < FakeModel
   build_fields
   build_associations(
     :clients => {:macro => :has_many, :options => {:through => :rentals}, :collection => true, :name => :clients},
-    :rentals => {:macro => :has_many, :collection => true, :name => :clients}
+    :rentals => {:macro => :has_many, :collection => true, :name => :rentals}
   )
 end
 
@@ -224,15 +224,24 @@ describe RailsPanel::ActiveRecordInspector do
         Car.form_attributes_keys.should == []
       end
 
+      # TODO: sometimes we would like to see  it in show...
       it "should not show record related in has many through association in show and index" do
         Car.show_attributes_keys.should == [:rentals]
-        Car.table_attributes_keys.should == [:rentals]
+        Car.table_attributes_keys.should == []
       end
     end
   end
 
   it "should exclude association fields form fields" do
     Order.fields.keys.should == [:client_name, :notes]
+  end
+
+  it "should not show many model related in index" do
+    Order.table_attributes_keys.should_not include(:discounts)
+  end
+
+  it "should not show habtm model related in index" do
+    Order.table_attributes_keys.should_not include(:products)
   end
 
   it "should exclude id and timestamp from fields" do
