@@ -5,7 +5,8 @@ module RailsPanel
 
     included do
       before_filter :set_current_model
-      helper_method :current_model, :current_resource
+      before_filter :rearange_view_paths_for_kaminari, :only => :index
+      helper_method :current_model, :current_resource, :current_resources
 
       # url helpers
       helper_method :link_to_new, :link_to_edit, :link_to_index, :link_to_show, :link_to_destroy, :url_for_create, :url_for_update
@@ -24,6 +25,7 @@ module RailsPanel
       p self._helpers.included_modules
       # load standard layout
       layout 'rails_panel/twitter_bootstrap'
+
     end
 
     module ClassMethods
@@ -84,8 +86,16 @@ module RailsPanel
 
       private
 
+      def rearange_view_paths_for_kaminari
+        # change order of views to get a chance to load kaminari changed views from rails_panel
+        kaminari_view_path = self.class.view_paths.map(&:to_s).grep(/kaminari/).first
+        new_view_paths = self.class.view_paths.dup.map(&:to_s).delete_if {|path| path =~ /kaminari/}
+        new_view_paths << kaminari_view_path
+        self.class.view_paths = new_view_paths
+      end
+
       def resources
-        current_model.all
+        current_model.page params[:page]
       end
 
       def resource_for_create
@@ -131,6 +141,10 @@ module RailsPanel
 
       def current_resource
         @resource
+      end
+
+      def current_resources
+        @resources
       end
 
       def model_mappings
