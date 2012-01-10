@@ -7,6 +7,8 @@ module RailsPanel
       before_filter :set_current_model
       helper_method :current_model, :current_resource
 
+      respond_to :html
+
       # url helpers
       helper_method :link_to_new, :link_to_edit, :link_to_index, :link_to_show, :link_to_destroy, :url_for_create, :url_for_update
       # hack to bring up resources helper before other applications helper
@@ -37,10 +39,12 @@ module RailsPanel
     module InstanceMethods
       def index
         @resources = resources
+        respond_with @resources
       end
 
       def show
         @resource = resource_for_show
+        respond_with @resource
       end
 
       def new
