@@ -5,7 +5,7 @@ module RailsPanel
 
     included do
       before_filter :set_current_model
-      helper_method :current_model, :current_resource
+      helper_method :current_model, :current_resource, :current_resources
 
       respond_to :html
 
@@ -26,6 +26,7 @@ module RailsPanel
       p self._helpers.included_modules
       # load standard layout
       layout 'rails_panel/twitter_bootstrap'
+
     end
 
     module ClassMethods
@@ -89,7 +90,7 @@ module RailsPanel
       private
 
       def resources
-        current_model.all
+        current_model.page params[:page]
       end
 
       def resource_for_create
@@ -135,6 +136,10 @@ module RailsPanel
 
       def current_resource
         @resource
+      end
+
+      def current_resources
+        @resources
       end
 
       def model_mappings

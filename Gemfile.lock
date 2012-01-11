@@ -52,6 +52,10 @@ GEM
       railties (~> 3.0)
       thor (~> 0.14)
     json (1.6.3)
+    kaminari (0.13.0)
+      actionpack (>= 3.0.0)
+      activesupport (>= 3.0.0)
+      railties (>= 3.0.0)
     mail (2.3.0)
       i18n (>= 0.4.0)
       mime-types (~> 1.16)
@@ -118,6 +122,7 @@ DEPENDENCIES
   formtastic
   formtastic-bootstrap
   jquery-rails
+  kaminari
   rails_panel!
   rspec-rails
   sqlite3

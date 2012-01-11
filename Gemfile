@@ -6,6 +6,7 @@ source "http://rubygems.org"
 gemspec
 gem "formtastic"
 gem "formtastic-bootstrap"
+gem "kaminari"
 
 # jquery-rails is used by the dummy application
 gem "jquery-rails"
