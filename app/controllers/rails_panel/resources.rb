@@ -5,7 +5,6 @@ module RailsPanel
 
     included do
       before_filter :set_current_model
-      before_filter :rearange_view_paths_for_kaminari, :only => :index
       helper_method :current_model, :current_resource, :current_resources
 
       # url helpers
@@ -85,14 +84,6 @@ module RailsPanel
       end
 
       private
-
-      def rearange_view_paths_for_kaminari
-        # change order of views to get a chance to load kaminari changed views from rails_panel
-        kaminari_view_path = self.class.view_paths.map(&:to_s).grep(/kaminari/).first
-        new_view_paths = self.class.view_paths.dup.map(&:to_s).delete_if {|path| path =~ /kaminari/}
-        new_view_paths << kaminari_view_path
-        self.class.view_paths = new_view_paths
-      end
 
       def resources
         current_model.page params[:page]

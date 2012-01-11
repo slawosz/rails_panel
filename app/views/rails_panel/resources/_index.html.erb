@@ -1,4 +1,5 @@
-<%= paginate current_resources %>
+<%= paginate current_resources, :theme => 'rails_panel' %>
+<%= controller.view_paths %>
 <%= link_to_new %>
 <table class='condensed-table'>
   <%= render 'resource_header' %>
@@ -7,4 +8,4 @@
   <% end %>
 <table>
 <%= link_to_new %>
-<%= paginate current_resources %>
+<%= paginate current_resources, :theme => 'rails_panel' %>
