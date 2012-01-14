@@ -7,16 +7,16 @@ module RailsPanel
   # This module is used to add methods used to display included model by RailsPanel
   # Every method in this model may be easy customize to your needs by overiding it in
   # including model. See methods documentation for this, especially:
-  # * `attributes`
-  # * `attributes_keys`
-  # * `show_attributes`
-  # * `show_attributes_keys`
-  # * `form_attributes`
-  # * `form_attributes_keys`
-  # * `table_attributes`
-  # * `table_attributes_keys`
+  # * attributes
+  # * attributes_keys
+  # * show_attributes
+  # * show_attributes_keys
+  # * form_attributes
+  # * form_attributes_keys
+  # * table_attributes
+  # * table_attributes_keys
   #
-  # To all above methods delegates corresponding methods in RailsPanel::ResourceHelper.
+  # To all above methods delegates corresponding methods in {RailsPanel::ResourceHelper}.
   # Reason of this is to overide only for one controller.
   module ActiveRecordInspector
     extend ActiveSupport::Concern
@@ -30,18 +30,18 @@ module RailsPanel
       #
       # This method may be inherited when you want to provide custom partial:
       #
-      # class MyModel < ActiveRecord::Base
-      #   inculde RailsPanel::ActiveRecordInspector
+      #   class MyModel < ActiveRecord::Base
+      #     inculde RailsPanel::ActiveRecordInspector
       #
-      #   def fields
-      #     super.merge(:field_to_customize => {:form_partial => :my_partial, :display => :simple})
+      #     def fields
+      #       super.merge(:field_to_customize => {:form_partial => :my_partial, :display => :simple})
+      #     end
       #   end
-      # end
       #
       # :my_partial will be _my_partial from app view path
       #
-      #  But in most cases for this customization is recomended to override ActiveRecordInspector.attributes or
-      #  RailsPanel::ResourcesHelper.attributes
+      #  But in most cases for this customization is recomended to override {RailsPanel::ActiveRecordInspector.attributes} or
+      #  {RailsPanel::ResourcesHelper.attributes}
       def fields
         fields = {}
         self.columns_hash.each do |field,data|
@@ -59,13 +59,11 @@ module RailsPanel
       # returns model associations hash, where association name is key which value is hash
       # with keys:
       # * :type - informs that is association, has value :association
-      # * :form_partial - which partial will be used to display this field in form,
-      # generaly it is determined by type_to_partial using association_type.
+      # * :form_partial - which partial will be used to display this field in form, generaly it is determined by type_to_partial using association_type.
       # * :associatied_model - class of model that is associated
       # * :association_type - type of association (has_many, belongs_to and so on)
       # * :form_field - field used for html input
-      # * :display - proc which get one parameter (model instance) and returns String (based on model _name method) or Array of string,
-      # used for displaying associated record(s) in show page
+      # * :display - proc which get one parameter (model instance) and returns String (based on model _name method) or Array of string, used for displaying associated record(s) in show page
       # * :form_data - proc which return data to display in form input, used for selecting associated records
       # * :through - if model is associated with another with has many through association, this key stores association used for through association
       #
