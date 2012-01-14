@@ -1,5 +1,33 @@
 require 'formtastic'
 module RailsPanel
+  # Include this module to rails controller, and it will display panel for related model out of the box!
+  #
+  # By default controller that includes this model has all CRUD actions:
+  # * index
+  # * show
+  # * new
+  # * create
+  # * edit
+  # * update
+  # * destroy
+  #
+  # All actions has corresponding views.
+  #
+  # But it is still normal RailsController, so:
+  # * any action can be override
+  # * any view can be override - see below
+  #
+  # You can also override some methods, for feching model data for controller.
+  # TODO: extract data methods to another module
+  # For these methods see,
+  #
+  #
+  # TODO
+  # Provided views:
+  # *
+  #
+  #
+  # To change model used in this controller, override method set_current_model
   module Resources
     extend ActiveSupport::Concern
 
@@ -89,6 +117,7 @@ module RailsPanel
 
       private
 
+      # Used in index
       def resources
         current_model.page params[:page]
       end
@@ -126,22 +155,27 @@ module RailsPanel
         @resource = current_model.find(params[:id])
       end
 
+      # Use this method to change model for this controller
       def set_current_model
         @current_model ||= model_mappings
       end
 
+      # Model used in this controller
       def current_model
         @current_model
       end
 
+      # Current model instance
       def current_resource
         @resource
       end
 
+      # Current model instances collection
       def current_resources
         @resources
       end
 
+      # Return model which will be used for current controller
       def model_mappings
         return if RailsPanel.controllers_without_model_mappings.map(&:name).include? self.class.name
         self.class.controller_name.classify.singularize.constantize
@@ -198,11 +232,12 @@ module RailsPanel
       end
 
       private
-      # I had problem with it in helper so I moved it here
+      # current controller url
       def _controller_url
         self.class.name.underscore.sub('_controller','')
       end
 
+      # Method that displays flash notices.
       def notice_for(resource, action, result = :success)
         "#{resource._name}, action #{action}"
       end
