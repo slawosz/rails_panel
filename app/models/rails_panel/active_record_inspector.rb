@@ -3,6 +3,21 @@ require 'active_support/core_ext/string'
 require 'active_support/inflector'
 
 module RailsPanel
+
+  # This module is used to add methods used to display included model by RailsPanel
+  # Every method in this model may be easy customize to your needs by overiding it in
+  # including model. See methods documentation for this, especially:
+  # * `attributes`
+  # * `attributes_keys`
+  # * `show_attributes`
+  # * `show_attributes_keys`
+  # * `form_attributes`
+  # * `form_attributes_keys`
+  # * `table_attributes`
+  # * `table_attributes_keys`
+  #
+  # To all above methods delegates corresponding methods in RailsPanel::ResourceHelper.
+  # Reason of this is to overide only for one controller.
   module ActiveRecordInspector
     extend ActiveSupport::Concern
 
@@ -11,7 +26,22 @@ module RailsPanel
       # returns model fields hash, where field is key and its value is hash with keys:
       # * :display - how to display the hash, default has value :simple
       # * :form_partial - which partial will be used to display this field in form,
-      # generaly it is determined by type_to_partial using field type.
+      # by default type_to_partial using field type.
+      #
+      # This method may be inherited when you want to provide custom partial:
+      #
+      # class MyModel < ActiveRecord::Base
+      #   inculde RailsPanel::ActiveRecordInspector
+      #
+      #   def fields
+      #     super.merge(:field_to_customize => {:form_partial => :my_partial, :display => :simple})
+      #   end
+      # end
+      #
+      # :my_partial will be _my_partial from app view path
+      #
+      #  But in most cases for this customization is recomended to override ActiveRecordInspector.attributes or
+      #  RailsPanel::ResourcesHelper.attributes
       def fields
         fields = {}
         self.columns_hash.each do |field,data|
@@ -38,6 +68,8 @@ module RailsPanel
       # used for displaying associated record(s) in show page
       # * :form_data - proc which return data to display in form input, used for selecting associated records
       # * :through - if model is associated with another with has many through association, this key stores association used for through association
+      #
+      # For customization, see ActiveRecordInspector.attributes docs
       def associations
         @assocs ||= {}
         @form_excluded_keys = []
@@ -109,10 +141,45 @@ module RailsPanel
         fields.keys
       end
 
+      # This is one of the most important method in RailsPanel.
+      # Return attributes hash, ie fields + model association.
+      # Stores all data required for displaying model in RailsPanel.
+      #
+      # When you want to customize displaying or form you should overide this method.
+      # For hash details see ActiveRecordInspector.associations and ActiveRecordInspector.fields
+      #
+      # Example:
+      #
+      # class MyModel < ActiveRecord::Base
+      #   inculde RailsPanel::ActiveRecordInspector
+      #
+      #   def attributes
+      #     custom_attributes = :field_or_association => {...} #some hash for field or association
+      #     super.merge(custom_attributes)
+      #   end
+      # end
+      #
+      # This method is used in RailsPanel::ResourceHelper, where it will be overiding in most cases.
       def attributes
         fields.merge associations
       end
 
+      # This method is used in view to iterate through attributes, we want to display.
+      #
+      # Returns array of symbols:
+      # [:title, :content, :comments]
+      #
+      # By overide this method, you can:
+      # * disable some attribute (field or association)
+      # * change order for displaying
+      #
+      # Also by overidding you can add custom attributes, that dont exists in model.
+      # When you add such attributes you should also override attributes method, to provide
+      # partial for display. This is very usefull for nested_attributes, javascript widgets like
+      # inputToken or uploadiffy
+      #
+      # For real life examples see wiki
+      #
       def attributes_keys
         associations_keys + fields_keys
       end
@@ -125,6 +192,8 @@ module RailsPanel
         show_and_table_attributes.keys - @show_and_table_excluded_keys
       end
 
+      # Attributes hash used only in show action, so overiding this methods
+      # affects only show actions
       def show_attributes
         show_and_table_attributes
       end
@@ -150,12 +219,15 @@ module RailsPanel
       end
 
 
+      # fields that are not displayed by default
       def excluded_fields
         [:id, :created_at, :updated_at]
       end
     end
 
     module InstanceMethods
+
+      # returns label, used by RailsPanel for displaying model
       def _name
         if self.respond_to? :name
           return self.name
