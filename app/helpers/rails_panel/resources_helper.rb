@@ -32,22 +32,27 @@ module RailsPanel
       current_model.table_attributes_keys
     end
 
+    # Current model attributes. Use this method to customize form. By default it delegates
     def form_attributes
       current_model.form_attributes
     end
 
+    # Current model attributes. Use this method to select or order fields in form. By default it delegates
     def form_attributes_keys
       current_model.form_attributes_keys
     end
 
+    # Current model attributes. Use this method to display or reorder fields in show action. By default it delegates
     def show_attributes_keys
       current_model.show_attributes_keys
     end
 
+    # Current model attributes. Use this method to customize attributes for all views in this controller. By default it delegates
     def show_attributes
       current_model.show_attributes
     end
 
+    # Current model attributes. Use this method to customize attributes for all views in this controller. By default it delegates
     def attributes
       current_model.attributes
     end
