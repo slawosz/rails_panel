@@ -34,11 +34,10 @@ module RailsPanel
     included do
       before_filter :set_current_model
       helper_method :current_model, :current_resource, :current_resources
+      helper_method :_controller_url
 
       respond_to :html
 
-      # url helpers
-      helper_method :link_to_new, :link_to_edit, :link_to_index, :link_to_show, :link_to_destroy, :url_for_create, :url_for_update
       # hack to bring up resources helper before other applications helper
       # to make them posibility to overide its methods, but it may be better way
       # to do this
@@ -181,54 +180,6 @@ module RailsPanel
         self.class.controller_name.classify.singularize.constantize
       rescue
         raise "Can not find model for #{self.class.name}. Overide model_mappings method in this controller or exclude it from using rails_panel in initializers."
-      end
-
-      def link_to_index
-        view_context.link_to 'Back to index', url_for_index
-      end
-
-      def url_for_index
-        url_for(:controller => _controller_url)
-      end
-
-      def link_to_show(resource, anchor = '')
-        view_context.link_to (anchor == '' ? resource._name : anchor), url_for_show(resource)
-      end
-
-      def url_for_show(resource)
-        url_for(:controller => _controller_url, :action => 'show', :id => resource.id)
-      end
-
-      def link_to_new
-        view_context.link_to "New", url_for_new
-      end
-
-      def url_for_new
-        url_for(:controller => _controller_url, :action => "new")
-      end
-
-      def link_to_edit(resource)
-        view_context.link_to 'Edit', url_for_edit(resource)
-      end
-
-      def url_for_edit(resource)
-        url_for(:controller => _controller_url, :action => "edit", :id => resource.id)
-      end
-
-      def link_to_destroy(resource)
-        view_context.link_to 'Destroy', url_for_destroy(resource), :confirm => 'Are you sure?', :method => :delete
-      end
-
-      def url_for_destroy(resource)
-        url_for(:controller => _controller_url, :action => "destroy", :id => resource.id)
-      end
-
-      def url_for_create
-        view_context.url_for(:controller => _controller_url, :action => "create")
-      end
-
-      def url_for_update(resource)
-        view_context.url_for(:controller => _controller_url, :action => "update")
       end
 
       private

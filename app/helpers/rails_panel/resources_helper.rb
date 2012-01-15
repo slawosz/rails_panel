@@ -1,5 +1,7 @@
 module RailsPanel
   module ResourcesHelper
+    include LinkHelper
+    include UrlHelper
 
     def render_resources_menu
       return if @resources_menu.nil?
