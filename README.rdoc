@@ -1,3 +1,17 @@
 = RailsPanel
 
-This project rocks and uses MIT-LICENSE.
+Experimental admin interface for Rails applications.
+
+See wiki:
+
+* https://github.com/slawosz/rails_panel/wiki/_pages
+
+and example apps:
+
+* https://github.com/slawosz/car_rental_app
+
+* https://github.com/slawosz/rails_panel_token_input
+
+If something is broken please tell me or fix.
+
+Have fun!
