@@ -12,6 +12,10 @@ and example apps:
 
 * https://github.com/slawosz/rails_panel_token_input
 
+and docs:
+
+* http://rdoc.info/github/slawosz/rails_panel/master/frames
+
 If something is broken please tell me or fix.
 
 Have fun!
