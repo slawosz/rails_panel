@@ -1,5 +1,6 @@
 = RailsPanel
 
+
 Experimental admin interface for Rails applications. It is prototype now, so if something is broken:
 
 * take a look into source code
@@ -7,6 +8,20 @@ Experimental admin interface for Rails applications. It is prototype now, so if 
 * send me an email or github msg
 
 * please put your not working app to github - I will take a look!
+
+How to start:
+
+* create models
+
+* create controller (blank class without methods) - have to include `RailsPanel::Resource`
+
+* no views needes - will be generated automagically
+
+* add routes
+
+* you may would like to use `rails g rails_panel:scaffold` - it works similar to normal rails scaffold
+
+* see example app
 
 See wiki and google group:
 
