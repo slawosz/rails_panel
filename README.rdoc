@@ -8,9 +8,10 @@ Experimental admin interface for Rails applications. It is prototype now, so if 
 
 * please put your not working app to github - I will take a look!
 
-See wiki:
+See wiki and google group:
 
 * https://github.com/slawosz/rails_panel/wiki/_pages
+* http://groups.google.com/group/rails_panel
 
 and example apps (uses rails_panel from directory):
 
