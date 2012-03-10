@@ -1,6 +1,14 @@
+require 'active_support/concern'
+require 'active_support/core_ext/string'
+require 'active_support/inflector'
+
 module RailsPanel
   module Representers
     class ActiveRecordRepresenter
+
+      def initialize(model)
+        @model = model
+      end
       # returns model fields hash, where field is key and its value is hash with keys:
       # * :display - how to display the hash, default has value :simple
       # * :form_partial - which partial will be used to display this field in form,
@@ -22,7 +30,7 @@ module RailsPanel
       #  {RailsPanel::ResourcesHelper.attributes}
       def fields
         fields = {}
-        self.columns_hash.each do |field,data|
+        @model.columns_hash.each do |field,data|
           fields[field.to_sym] = {:form_partial => type_to_partial[data.type], :display => :simple}
         end
         associations.each_value do |data|
@@ -51,7 +59,7 @@ module RailsPanel
         @form_excluded_keys = []
         @show_and_table_excluded_keys = []
         @table_excluded_keys = []
-        self.reflections.each do |name, data|
+        @model.reflections.each do |name, data|
           @assocs[name] = {
             :type => :association,
             :form_partial => type_to_partial[data.macro],
@@ -105,7 +113,7 @@ module RailsPanel
       # * :params_key - key that will be used to get model data form params hash
       def properties
         {
-          :params_key => self.name.underscore.to_sym
+          :params_key => @model.name.underscore.to_sym
         }
       end
 
@@ -193,7 +201,6 @@ module RailsPanel
       def form_attributes_keys
         form_attributes.keys - @form_excluded_keys
       end
-
 
       # fields that are not displayed by default
       def excluded_fields
