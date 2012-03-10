@@ -4,6 +4,21 @@ require 'active_support/inflector'
 
 module RailsPanel
   module Representers
+
+     # This class is used to represent models in RailsPanel.
+     #
+     # See methods documentation for this, especially:
+     # * attributes
+     # * attributes_keys
+     # * show_attributes
+     # * show_attributes_keys
+     # * form_attributes
+     # * form_attributes_keys
+     # * table_attributes
+     # * table_attributes_keys
+     #
+     # To all above methods delegates corresponding methods in {RailsPanel::ResourceHelper}.
+     # Reason of this is to overide these methods only for one controller.
     class ActiveRecordRepresenter
 
       def initialize(model)
