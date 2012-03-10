@@ -66,7 +66,7 @@ module RailsPanel
             :associated_model => name.to_s.classify.singularize.constantize,
             :association_type => data.macro,
             :form_field => (name.to_s.singularize + "_id").to_sym,
-            :display => data.collection? ? lambda {|obj| obj.send(name).map{|a| a.send(:_name)}} : lambda {|obj| (rel_obj = obj.send(name)) ? rel_obj.send(:_name) : nil},
+            :display => data.collection? ? lambda {|obj| obj.send(name).map{|a| label_for(a)}} : lambda {|obj| (rel_obj = obj.send(name)) ? label_for(rel_obj) : nil},
             :form_data => form_data_proc_for_association(name.to_s.classify.singularize.constantize)[data.macro],
             :through => data.options[:through]
           }
@@ -101,8 +101,8 @@ module RailsPanel
 
       def form_data_proc_for_association(model_class)
         {
-          :belongs_to => lambda { model_class.all.map{ |c| [c._name, c.id] }},
-          :has_one => lambda { model_class.all.map{ |c| [c._name, c.id] }},
+          :belongs_to => lambda { model_class.all.map{ |c| [label_for(c), c.id] }},
+          :has_one => lambda { model_class.all.map{ |c| [label_for(c), c.id] }},
           :has_many   => lambda { model_class.all },
           :has_and_belongs_to_many => lambda { model_class.all }
         }
@@ -205,6 +205,16 @@ module RailsPanel
       # fields that are not displayed by default
       def excluded_fields
         [:id, :created_at, :updated_at]
+      end
+
+      def label_for(obj)
+        if obj.respond_to? :name
+          return obj.name
+        end
+        if obj.respond_to? :title
+          return obj.title
+        end
+        obj.class.name + obj.id.to_s
       end
     end
   end

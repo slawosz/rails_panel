@@ -125,12 +125,12 @@ module RailsPanel
       end
 
       def resource_for_create
-        _params = params[current_model.properties[:params_key]]
+        _params = params[model_representer.properties[:params_key]]
         current_model.new(_params)
       end
 
       def update_resource(resource)
-        resource.update_attributes(params[current_model.properties[:params_key]])
+        resource.update_attributes(params[model_representer.properties[:params_key]])
       end
 
       def destroy_resource
@@ -201,7 +201,7 @@ module RailsPanel
 
       # Method that displays flash notices.
       def notice_for(resource, action, result = :success)
-        "#{resource._name}, action #{action}"
+        "#{model_representer.label_for(resource)}, action #{action}"
       end
     end
 
