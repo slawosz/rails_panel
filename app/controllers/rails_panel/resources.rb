@@ -1,5 +1,6 @@
 require 'formtastic'
 module RailsPanel
+
   # Include this module to rails controller, and it will display panel for related model out of the box!
   #
   # By default controller that includes this model has all CRUD actions:
@@ -33,7 +34,7 @@ module RailsPanel
 
     included do
       before_filter :set_current_model
-      helper_method :current_model, :current_resource, :current_resources
+      helper_method :current_model, :current_resource, :current_resources, :model_representer
       helper_method :_controller_url
 
       respond_to :html
@@ -65,6 +66,8 @@ module RailsPanel
     end
 
     module InstanceMethods
+      include UrlHelper
+
       def index
         @resources = resources
         respond_with @resources
@@ -122,12 +125,12 @@ module RailsPanel
       end
 
       def resource_for_create
-        _params = params[current_model.properties[:params_key]]
+        _params = params[model_representer.properties[:params_key]]
         current_model.new(_params)
       end
 
       def update_resource(resource)
-        resource.update_attributes(params[current_model.properties[:params_key]])
+        resource.update_attributes(params[model_representer.properties[:params_key]])
       end
 
       def destroy_resource
@@ -174,6 +177,14 @@ module RailsPanel
         @resources
       end
 
+      def model_representer
+        @model_representer ||= model_representer_class.new(@current_model)
+      end
+
+      def model_representer_class
+        RailsPanel::Representers::ActiveRecordRepresenter
+      end
+
       # Return model which will be used for current controller
       def model_mappings
         return if RailsPanel.controllers_without_model_mappings.map(&:name).include? self.class.name
@@ -190,7 +201,7 @@ module RailsPanel
 
       # Method that displays flash notices.
       def notice_for(resource, action, result = :success)
-        "#{resource._name}, action #{action}"
+        "#{model_representer.label_for(resource)}, action #{action}"
       end
     end
 
