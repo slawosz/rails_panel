@@ -1,5 +1,6 @@
 require 'formtastic'
 module RailsPanel
+
   # Include this module to rails controller, and it will display panel for related model out of the box!
   #
   # By default controller that includes this model has all CRUD actions:
@@ -33,7 +34,7 @@ module RailsPanel
 
     included do
       before_filter :set_current_model
-      helper_method :current_model, :current_resource, :current_resources
+      helper_method :current_model, :current_resource, :current_resources, :model_representer
       helper_method :_controller_url
 
       respond_to :html
@@ -65,6 +66,8 @@ module RailsPanel
     end
 
     module InstanceMethods
+      include UrlHelper
+
       def index
         @resources = resources
         respond_with @resources
@@ -172,6 +175,10 @@ module RailsPanel
       # Current model instances collection
       def current_resources
         @resources
+      end
+
+      def model_representer
+        @model_representer ||= RailsPanel::Representers::ActiveRecordRepresenter.new(@current_model)
       end
 
       # Return model which will be used for current controller
