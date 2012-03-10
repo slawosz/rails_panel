@@ -3,26 +3,27 @@ require 'active_support/core_ext/string'
 require 'active_support/inflector'
 
 module RailsPanel
+  module Representers
 
-  # This module is used to add methods used to display included model by RailsPanel
-  # Every method in this model may be easy customize to your needs by overiding it in
-  # including model. See methods documentation for this, especially:
-  # * attributes
-  # * attributes_keys
-  # * show_attributes
-  # * show_attributes_keys
-  # * form_attributes
-  # * form_attributes_keys
-  # * table_attributes
-  # * table_attributes_keys
-  #
-  # To all above methods delegates corresponding methods in {RailsPanel::ResourceHelper}.
-  # Reason of this is to overide only for one controller.
-  module ActiveRecordInspector
-    extend ActiveSupport::Concern
+     # This class is used to represent models in RailsPanel.
+     #
+     # See methods documentation for this, especially:
+     # * attributes
+     # * attributes_keys
+     # * show_attributes
+     # * show_attributes_keys
+     # * form_attributes
+     # * form_attributes_keys
+     # * table_attributes
+     # * table_attributes_keys
+     #
+     # To all above methods delegates corresponding methods in {RailsPanel::ResourceHelper}.
+     # Reason of this is to overide these methods only for one controller.
+    class ActiveRecordRepresenter
 
-    module ClassMethods
-
+      def initialize(model)
+        @model = model
+      end
       # returns model fields hash, where field is key and its value is hash with keys:
       # * :display - how to display the hash, default has value :simple
       # * :form_partial - which partial will be used to display this field in form,
@@ -44,7 +45,7 @@ module RailsPanel
       #  {RailsPanel::ResourcesHelper.attributes}
       def fields
         fields = {}
-        self.columns_hash.each do |field,data|
+        @model.columns_hash.each do |field,data|
           fields[field.to_sym] = {:form_partial => type_to_partial[data.type], :display => :simple}
         end
         associations.each_value do |data|
@@ -73,14 +74,14 @@ module RailsPanel
         @form_excluded_keys = []
         @show_and_table_excluded_keys = []
         @table_excluded_keys = []
-        self.reflections.each do |name, data|
+        @model.reflections.each do |name, data|
           @assocs[name] = {
             :type => :association,
             :form_partial => type_to_partial[data.macro],
             :associated_model => name.to_s.classify.singularize.constantize,
             :association_type => data.macro,
             :form_field => (name.to_s.singularize + "_id").to_sym,
-            :display => data.collection? ? lambda {|obj| obj.send(name).map{|a| a.send(:_name)}} : lambda {|obj| (rel_obj = obj.send(name)) ? rel_obj.send(:_name) : nil},
+            :display => data.collection? ? lambda {|obj| obj.send(name).map{|a| label_for(a)}} : lambda {|obj| (rel_obj = obj.send(name)) ? label_for(rel_obj) : nil},
             :form_data => form_data_proc_for_association(name.to_s.classify.singularize.constantize)[data.macro],
             :through => data.options[:through]
           }
@@ -115,8 +116,8 @@ module RailsPanel
 
       def form_data_proc_for_association(model_class)
         {
-          :belongs_to => lambda { model_class.all.map{ |c| [c._name, c.id] }},
-          :has_one => lambda { model_class.all.map{ |c| [c._name, c.id] }},
+          :belongs_to => lambda { model_class.all.map{ |c| [label_for(c), c.id] }},
+          :has_one => lambda { model_class.all.map{ |c| [label_for(c), c.id] }},
           :has_many   => lambda { model_class.all },
           :has_and_belongs_to_many => lambda { model_class.all }
         }
@@ -127,7 +128,7 @@ module RailsPanel
       # * :params_key - key that will be used to get model data form params hash
       def properties
         {
-          :params_key => self.name.underscore.to_sym
+          :params_key => @model.name.underscore.to_sym
         }
       end
 
@@ -216,24 +217,19 @@ module RailsPanel
         form_attributes.keys - @form_excluded_keys
       end
 
-
       # fields that are not displayed by default
       def excluded_fields
         [:id, :created_at, :updated_at]
       end
-    end
 
-    module InstanceMethods
-
-      # returns label, used by RailsPanel for displaying model
-      def _name
-        if self.respond_to? :name
-          return self.name
+      def label_for(obj)
+        if obj.respond_to? :name
+          return obj.name
         end
-        if self.respond_to? :title
-          return self.title
+        if obj.respond_to? :title
+          return obj.title
         end
-        self.class.name + self.id.to_s
+        obj.class.name + obj.id.to_s
       end
     end
   end
