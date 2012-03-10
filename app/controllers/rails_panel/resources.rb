@@ -178,7 +178,11 @@ module RailsPanel
       end
 
       def model_representer
-        @model_representer ||= RailsPanel::Representers::ActiveRecordRepresenter.new(@current_model)
+        @model_representer ||= model_representer_class.new(@current_model)
+      end
+
+      def model_representer_class
+        RailsPanel::Representers::ActiveRecordRepresenter
       end
 
       # Return model which will be used for current controller
