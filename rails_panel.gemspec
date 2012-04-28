@@ -21,6 +21,7 @@ Gem::Specification.new do |s|
   s.add_dependency "formtastic-bootstrap"
   s.add_dependency "kaminari"
   s.add_dependency "twitter-bootstrap-rails"
+  s.add_dependency "libv8"
 
   s.add_development_dependency "sqlite3"
   s.add_development_dependency "rspec-rails"
