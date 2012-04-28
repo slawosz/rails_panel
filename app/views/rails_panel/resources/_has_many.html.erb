@@ -4,7 +4,7 @@
     <ul class='input-list'>
       <% form_data.call.each do |associated_record| %>
         <li>
-        <%= check_box_tag "#{current_model_params_key}[#{form_field.to_s.pluralize}][]", associated_record.id, current_resource.send(association).include?(associated_record) %>
+        <%= check_box_tag "#{model_representer_params_key}[#{form_field.to_s.pluralize}][]", associated_record.id, current_resource.send(association).include?(associated_record) %>
         <span><%= associated_record._name %></span>
         </li>
       <% end %>

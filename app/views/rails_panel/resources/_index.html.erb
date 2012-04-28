@@ -1,10 +1,14 @@
 <%= paginate current_resources, :theme => 'rails_panel' %>
-<%= link_to_new %>
-<table class='condensed-table'>
+<div class="well">
+  <%= link_to_new %> <b>Currently <%= pluralize(@resources.count, 'resource') %></b>
+</div>
+<table class='table table-striped'>
   <%= render 'resource_header' %>
   <% @resources.each do |resource| %>
     <%= render :partial => 'resource_row', :locals => {:resource => resource} %>
   <% end %>
 <table>
-<%= link_to_new %>
+<div class="well">
+  <%= link_to_new %>
+</div>
 <%= paginate current_resources, :theme => 'rails_panel' %>

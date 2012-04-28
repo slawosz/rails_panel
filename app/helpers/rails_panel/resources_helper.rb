@@ -5,9 +5,10 @@ module RailsPanel
 
     def render_resources_menu
       return if @resources_menu.nil?
-      html = '<ul class="pills">'
+      html = '<ul class="nav nav-pills">'
       @resources_menu.each do |title, path|
-        html << "<li>" + link_to(title, path) + "</li>"
+        css_class = (path == request.fullpath || request.fullpath[/(.*)\/.*/,1] == path) ? 'active' : ''
+        html << "<li class='#{css_class}'>" + link_to(title, path) + "</li>"
       end
       html << "</ul>"
       html.html_safe
