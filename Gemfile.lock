@@ -4,7 +4,9 @@ PATH
     rails_panel (0.0.1)
       formtastic
       formtastic-bootstrap
+      kaminari
       rails (~> 3.1.1)
+      twitter-bootstrap-rails
 
 GEM
   remote: http://rubygems.org/
@@ -39,6 +41,7 @@ GEM
       multi_json (~> 1.0)
     arel (2.2.1)
     builder (3.0.0)
+    commonjs (0.2.6)
     diff-lcs (1.1.3)
     erubis (2.7.0)
     formtastic (2.0.2)
@@ -56,6 +59,11 @@ GEM
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
       railties (>= 3.0.0)
+    less (2.2.1)
+      commonjs (~> 0.2.6)
+    less-rails (2.2.2)
+      actionpack (>= 3.1)
+      less (~> 2.2.0)
     mail (2.3.0)
       i18n (>= 0.4.0)
       mime-types (~> 1.16)
@@ -106,13 +114,17 @@ GEM
     sprockets (2.0.3)
       hike (~> 1.2)
       rack (~> 1.0)
-      tilt (!= 1.3.0, ~> 1.1)
+      tilt (~> 1.1, != 1.3.0)
     sqlite3 (1.3.5)
     thor (0.14.6)
     tilt (1.3.3)
     treetop (1.4.10)
       polyglot
       polyglot (>= 0.3.1)
+    twitter-bootstrap-rails (2.0.6)
+      actionpack (>= 3.1)
+      less-rails (~> 2.2.0)
+      railties (>= 3.1)
     tzinfo (0.3.31)
 
 PLATFORMS
